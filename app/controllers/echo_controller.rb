@@ -50,7 +50,6 @@ class EchoController < ApplicationController
 
   def destroy_session
     if session_header.present?
-      binding.pry
       Echoable.where(session_id: session_header).destroy_all
 
       render text: 'SESSION REMOVED', status: 200

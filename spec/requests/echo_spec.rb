@@ -149,7 +149,7 @@ describe 'echo endpoint' do
       delete "/session", {}, { 'REQUEST_SESSION' => TEST_RUN_ID }
 
       expect(response.body).to eq 'SESSION REMOVED'
-    end.to change { echoables.count }.to 0
+    end.to change { Echoable.count }.to 0
 
   end
 end
