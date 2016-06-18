@@ -79,10 +79,10 @@ describe 'echo endpoint' do
         expect(response_json).to have_key 'combined_from'
       end
 
-      green_reponse = response_set.find {|rj| rj['name'] == 'green' }
+      green_response = response_set.find {|rj| rj['name'] == 'green' }
 
-      expect(green_reponse['combined_from']).to eq ['yellow', 'blue']
-      expect(green_reponse['id']).to eq green_echoable.id
+      expect(green_response['combined_from']).to eq ['yellow', 'blue']
+      expect(green_response['id']).to eq green_echoable.id
     end
   end
 
@@ -129,7 +129,6 @@ describe 'echo endpoint' do
   end
 
   it 'deletes items created in the same session' do
-
     green_echoable = Echoable.new(name: 'color', data: {name: 'green', combined_from: ['yellow', 'blue']})
 
     echoables = [
@@ -140,7 +139,7 @@ describe 'echo endpoint' do
     ]
 
     echoables.each do |echoable|
-      post "/#{echoable.name}", echoable.data, { 'REQUEST_SESSION' => TEST_RUN_ID }
+      post "/#{echoable.name}", { echoable.name => echoable.data }, { 'REQUEST_SESSION' => TEST_RUN_ID }
     end
 
     expect(Echoable.count).to eq echoables.count
@@ -150,6 +149,37 @@ describe 'echo endpoint' do
 
       expect(response.body).to eq 'SESSION REMOVED'
     end.to change { Echoable.count }.to 0
+  end
 
+  it 'only includes items created in the same session' do
+    green_echoable = Echoable.new(name: 'color', data: {name: 'green', combined_from: ['yellow', 'blue']})
+
+    green_echoable.save!
+
+    echoables = [
+      Echoable.new(name: 'color', data: {name: 'pink', combined_from: ['red', 'white']}),
+      Echoable.new(name: 'color', data: {name: 'purple', combined_from: ['red', 'blue']}),
+      Echoable.new(name: 'color', data: {name: 'orange', combined_from: ['yellow', 'red']})
+    ]
+
+    echoables.each do |echoable|
+      post "/#{echoable.name}", { echoable.name => echoable.data }, { 'REQUEST_SESSION' => TEST_RUN_ID }
+    end
+
+    expect(Echoable.count).to eq (echoables.count + 1)
+
+    get "/colors", {}, { 'REQUEST_SESSION' => TEST_RUN_ID }
+
+     JSON.parse(response.body).tap do |response_set|
+      response_set.each do |response_json|
+        expect(response_json).to have_key 'id'
+        expect(response_json).to have_key 'name'
+        expect(response_json).to have_key 'combined_from'
+      end
+
+      green_response = response_set.find {|rj| rj['name'] == 'green' }
+
+      expect(green_response).to be_nil
+    end
   end
 end
