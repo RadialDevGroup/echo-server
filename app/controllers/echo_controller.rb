@@ -41,7 +41,7 @@ class EchoController < ApplicationController
   def update
     echoable = default_scope.find params[:id]
 
-    echoable.attributes = {data: model_params.except(:id)}
+    echoable.attributes = { data: echoable.data.merge(model_params.except(:id)) }
 
     echoable.save
 

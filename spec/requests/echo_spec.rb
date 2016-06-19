@@ -113,6 +113,26 @@ describe 'echo endpoint' do
     end
   end
 
+  it 'partially updates an echo' do
+    echoable = Echoable.new name: 'project', data: {
+      name: 'purple', address: "413 N Railroad Ave", city: "Loveland", state: "CO", zip: "80537"
+    }
+
+    echoable.save!
+
+    updated_echoable = {project: { name: 'orange' }}
+
+    patch "/projects/#{echoable.id}", updated_echoable
+
+    JSON.parse(response.body).tap do |response_json|
+      expect(response_json['name']).to eq "orange"
+      expect(response_json['address']).to eq "413 N Railroad Ave"
+      expect(response_json['city']).to eq 'Loveland'
+      expect(response_json['state']).to eq 'CO'
+      expect(response_json['zip']).to eq '80537'
+    end
+  end
+
   it 'deletes a class' do
     green_echoable = Echoable.new(name: 'color', data: {name: 'green', combined_from: ['yellow', 'blue']})
 
