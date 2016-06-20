@@ -36,7 +36,6 @@ module Echo
       allow do
         origins '*'
         resource '*', :headers => :any, :methods => [:get, :post, :options]
-        headers :any
       end
     end
   end
