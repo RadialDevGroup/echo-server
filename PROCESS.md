@@ -7,9 +7,11 @@
 2. Create a local branch in your development environment to work on the story.
 
     Example:
+    ```
         $ git fetch
         $ git branch 1-add-item-to-session
         $ git checkout 1-add-item-to-session
+    ```
 
 3. Create a feature spec for your feature.
 
