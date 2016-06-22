@@ -81,6 +81,6 @@ class EchoController < ApplicationController
   end
 
   def session_header
-    request.headers['REQUEST_SESSION']
+    request.headers['REQUEST_SESSION'] or request.headers['HTTP_REQUEST_SESSION']
   end
 end
